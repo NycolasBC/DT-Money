@@ -1,10 +1,33 @@
+import { useEffect, useState } from "react";
 import { Header } from "../../Components/Header";
 import { Summary } from "../../Components/Summary";
 import { SearchForm } from "./Components/SearchForm";
 import { PriceHighLight, TransactionsContainer, TransactionsTable } from "./styles";
 
+interface TransactionsProps {
+    ID: number,
+    DESCRIPTION: string,
+    TYPE: 'income' | 'outcome',
+    CATEGORY: string,
+    PRICE: number,
+    CREATED_AT: string
+}
 
 export function Transactions() {
+    const [transactions, setTransactions] = useState<TransactionsProps[]>([])
+
+    async function loadTransactions() {
+        const response = await fetch('http://localhost:3000/transactions')
+        const data = await response.json()
+
+        setTransactions(data)
+        console.log("data: ", transactions)
+    }
+
+    useEffect(() => {
+        loadTransactions()
+    }, [])
+
     return (
         <div>
             <Header />
@@ -15,26 +38,20 @@ export function Transactions() {
 
                 <TransactionsTable>
                     <tbody>
-                        <tr>
-                            <td width='50%'>Desenvolvimento de site</td>
-                            <td>
-                                <PriceHighLight variant="income">
-                                    R$ 12.000,00
-                                </PriceHighLight>
-                            </td>
-                            <td>Venda</td>
-                            <td>13/04/2023</td>
-                        </tr>
-                        <tr>
-                            <td width='50%'>Hamburger</td>
-                            <td>
-                                <PriceHighLight variant="outcome">
-                                    - R$ 59,00
-                                </PriceHighLight>
-                            </td>
-                            <td>Alimentação</td>
-                            <td>10/04/2023</td>
-                        </tr>
+                        {transactions.map(transaction => {
+                            return (
+                                <tr key={transaction.ID}>
+                                    <td width='50%'>{transaction.DESCRIPTION}</td>
+                                    <td>
+                                        <PriceHighLight variant={transaction.TYPE}>
+                                            {transaction.PRICE}
+                                        </PriceHighLight>
+                                    </td>
+                                    <td>{transaction.CATEGORY}</td>
+                                    <td>{transaction.CREATED_AT}</td>
+                                </tr>
+                            )
+                        })}
                     </tbody>
                 </TransactionsTable>
             </TransactionsContainer>
