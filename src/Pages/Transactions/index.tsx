@@ -22,7 +22,7 @@ export function Transactions() {
                     <tbody>
                         {transactions.map(transaction => {
                             return (
-                                <tr key={transaction.ID}>
+                                <tr key={transaction.id}>
                                     <td width='50%'>{transaction.DESCRIPTION}</td>
                                     <td>
                                         <PriceHighLight variant={transaction.TYPE}>

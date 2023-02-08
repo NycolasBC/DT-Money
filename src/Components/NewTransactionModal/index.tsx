@@ -12,28 +12,42 @@ import {
     TransactionTypeButton
 } from "./styles";
 
+import { useContext } from "react";
+import { TransactionsContext } from "../../Contexts/TransactionsContext";
+
 
 const newTransactionFormSchema = z.object({
-    description: z.string(),
-    price: z.number(),
-    category: z.string(),
-    type: z.enum(['income', 'outcome']),
+    DESCRIPTION: z.string(),
+    PRICE: z.number(),
+    CATEGORY: z.string(),
+    TYPE: z.enum(['income', 'outcome']),
 })
 
 type NewTransactionsFormInputs = z.infer<typeof newTransactionFormSchema>
 
 export function NewTransactionModal() {
+    const { createTransaction } = useContext(TransactionsContext)
     const {
         control,
         register,
         handleSubmit,
+        reset,
         formState: { isSubmitting }
     } = useForm<NewTransactionsFormInputs>({
         resolver: zodResolver(newTransactionFormSchema),
     })
 
     async function handleCreateNewTransaction(data: NewTransactionsFormInputs) {
-        // await data
+        const { DESCRIPTION, CATEGORY, PRICE, TYPE } = data
+
+        createTransaction({
+            DESCRIPTION,
+            CATEGORY,
+            PRICE,
+            TYPE
+        })
+
+        reset()
     }
 
     return (
@@ -51,22 +65,22 @@ export function NewTransactionModal() {
                     <input
                         type="text"
                         placeholder="Descrição"
-                        required {...register('description')}
+                        required {...register('DESCRIPTION')}
                     />
                     <input
                         type="number"
                         placeholder="Preço"
-                        required {...register('price', { valueAsNumber: true })}
+                        required {...register('PRICE', { valueAsNumber: true })}
                     />
                     <input
                         type="text"
                         placeholder="Categoria"
-                        required {...register('category')}
+                        required {...register('CATEGORY')}
                     />
 
                     <Controller
                         control={control}
-                        name='type'
+                        name='TYPE'
                         render={({ field }) => {
                             return (
                                 <TransactionType onValueChange={field.onChange} value={field.value}>
